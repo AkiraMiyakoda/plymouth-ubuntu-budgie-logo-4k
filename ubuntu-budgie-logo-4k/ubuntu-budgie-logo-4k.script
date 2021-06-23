@@ -96,7 +96,7 @@ fun TextYOffset() {
     local.min_height;
 
     # Put the 1st line below the logo + some spacing 
-    y = logo.y + logo.height + (progress_indicator.bullet_height * 3 ); # + logo_spacing;
+    y = logo.y + Math.Max(logo.height, symbol.height) + 60;
 
     text_height = first_line_height * 7.5;
 
@@ -104,8 +104,6 @@ fun TextYOffset() {
     if (y + text_height > min_height)
         y = min_height - text_height;
 
-    if (y < progress_indicator.y + progress_indicator.height)
-        return progress_indicator.y + progress_indicator.height;
     return y;
 }
 
@@ -179,6 +177,7 @@ Window.SetBackgroundBottomColor (0.2353, 0.2314, 0.2157);  # an equally nice col
 
 bits_per_pixel = Window.GetBitsPerPixel ();
 logo_filename = "ubuntu_budgie_logo.png";
+symbol_filename = "ubuntu_budgie_symbol.png";
 progress_dot_off_filename = "progress_dot_off.png";
 progress_dot_on_filename = "progress_dot_on.png";
 password_mask_filename = "password_mask.png";
@@ -186,36 +185,38 @@ password_field_filename = "password_field.png";
 question_field_filename = "password_field.png";
 
 logo.image = Image (logo_filename);
-logo.sprite = Sprite ();
-logo.sprite.SetImage (logo.image);
 logo.width = logo.image.GetWidth ();
 logo.height = logo.image.GetHeight ();
-logo.x = Window.GetX () + Window.GetWidth () / 2 - logo.width  / 2;
-logo.y = Window.GetY () + Window.GetHeight () / 2 - logo.height / 1.3;
+
+symbol.image = Image (symbol_filename);
+symbol.width = symbol.image.GetWidth();
+symbol.height = symbol.image.GetHeight();
+
+logo.sprite = Sprite ();
+logo.sprite.SetImage (logo.image);
+logo.x = Window.GetX () + Window.GetWidth () / 2 - (logo.width + symbol.width) / 2;
+logo.y = Window.GetY () + Window.GetHeight () / 2 - Math.Max(logo.height, symbol.height) / 1.3;
 logo.z = 1000;
 logo.sprite.SetX (logo.x);
 logo.sprite.SetY (logo.y);
 logo.sprite.SetZ (logo.z);
 logo.sprite.SetOpacity (1);
 
-# Spacing below the logo - in pixels
-logo_spacing = logo.height * 4;
+symbol.sprite = Sprite ();
+symbol.sprite.SetImage (symbol.image);
+symbol.x = logo.x + logo.width;
+symbol.y = logo.y;
+symbol.z = 1000;
+symbol.sprite.SetX (symbol.x);
+symbol.sprite.SetY (symbol.y);
+symbol.sprite.SetZ (symbol.z);
+symbol.sprite.SetOpacity (1);
 
 message_notification[0].image = ImageToTintedText ("");
 message_notification[1].image = ImageToTintedText ("");
 fsck_notification.image = ImageToActionText ("");
 
 status = "normal";
-
-progress_indicator.bullet_off = Image (progress_dot_off_filename);
-progress_indicator.bullet_on = Image (progress_dot_on_filename);
-progress_indicator.bullet_width = progress_indicator.bullet_off.GetWidth ();
-progress_indicator.bullet_height = progress_indicator.bullet_off.GetHeight ();
-progress_indicator.bullet_hspacing = progress_indicator.bullet_width * 1.1;
-progress_indicator.width = progress_indicator.bullet_width * 5;
-progress_indicator.height = progress_indicator.bullet_height;
-progress_indicator.y = logo.y + logo.height + (logo.height / 10);
-progress_indicator.x = Window.GetX () + Window.GetWidth () / 2 - progress_indicator.width / 2; # logo.x + 26;
 
 # use a fixed string with ascending and descending stems to calibrate the
 # bounding box for the first message, so the messages below don't move up
@@ -227,139 +228,17 @@ first_line_height = ImageToTintedText ("AfpqtM").GetHeight();
 # a bit if needed.
 top_of_the_text = TextYOffset();
 
-#-----------------------------------------Logo functions------------------------------
-
-# Call this when updating the screen
-fun draw_logo () {
-    logo.sprite.SetX (logo.x);
-    logo.sprite.SetY (logo.y);
-    logo.sprite.SetZ (logo.z);
-    logo.sprite.SetOpacity (1);
-}
-
-
-#-----------------------------------------Progress Indicator--------------------------
-fun set_progress_indicator () {
-    
-    
-    # Here we assume that we can store half bullets on each half of the screen
-    # together with some spacing
-    local.x = progress_indicator.x;
-    
-    for (index = 0; index <= 4; index++) {
-        # Set the "off" bullets
-        progress_indicator.bullets_off[index].sprite = Sprite (progress_indicator.bullet_off);
-        progress_indicator.bullets_off[index].sprite.SetPosition (local.x, progress_indicator.y, 1000);
-        progress_indicator.bullets_off[index].x = local.x;
-        progress_indicator.bullets_off[index].y = progress_indicator.y;
-        progress_indicator.bullets_off[index].sprite.SetOpacity (1);
-        
-        #local.debug_medium_string = "Progress indicator " + index + ": x = " + progress_indicator.bullets_off[index].x +
-        #                  ", y = " + progress_indicator.bullets_off[index].y  + ", logo width = " + logo.width +
-        #                  ", logo height = " + logo.height + " " + screen_width + " " + screen_height;
-        #   
-        #(index % 2) && DebugMedium (local.debug_medium_string) || DebugBottom (local.debug_medium_string);
-
-        # Set the "on" bullets on top of the "off" bullets and make them transparent
-        progress_indicator.bullets_on[index].sprite = Sprite (progress_indicator.bullet_on);
-        progress_indicator.bullets_on[index].x = progress_indicator.bullets_off[index].x;
-        progress_indicator.bullets_on[index].y = progress_indicator.bullets_off[index].y;
-        progress_indicator.bullets_on[index].sprite.SetPosition (progress_indicator.bullets_on[index].x, progress_indicator.bullets_on[index].y, 10000);
-
-        progress_indicator.bullets_on[index].sprite.SetOpacity (0);
-        
-        local.x += progress_indicator.bullet_hspacing;
-    }
-    #local.debug_string = "Progress indicator: x1 = " + progress_indicator.x + ", x2 = " + local.x + ", y = " + progress_indicator.y +
-    #                      ", x logo = " + logo.x + ", y logo = " + logo.y + ", indicator width = " + progress_indicator.width;
-    #Debug(progress_indicator.bullets_off[0].x);
-}
-
-
-# We have 2 bullets, one on top of the other:
-# The white one is on top of the red one and the former should
-# slowly fade so as to get a nice transition effect.
-fun switch_on_bullet (bullets_off, bullets_on, bullet_number, opacity) {
-    local.x = bullets_on[bullet_number].x;
-    local.y = bullets_on[bullet_number].y;
-    local.z = bullets_on[bullet_number].z;
-    
-    # Hide the bullets which are off
-    bullets_off[bullet_number].sprite.SetOpacity (0);
-    
-    # Show the bullets which are on
-    bullets_on[bullet_number].sprite.SetPosition (local.x, local.y, local.z);
-    bullets_on[bullet_number].sprite.SetOpacity (opacity);
-    
-    # Bump the number of times we have switched on bullets
-    global.times_bullets_switched++;
-}
-
-fun switch_off_bullets () {
-    # Debug("Switching off progress indicator");
-    
-    set_progress_indicator ();
-    global.times_bullets_switched = 0;
-    global.on_off = 1;
-}
-
-# This is something that we can call when we exit
-fun switch_on_bullets () {
-    # Debug("Switching off progress indicator");
-    if (!global.progress_indicator.bullets_on) set_progress_indicator ();
-    local = global.progress_indicator;
-
-    for (index = 0; bullets_on[index]; index++) {
-        switch_on_bullet (bullets_off, bullets_on, index, 1.0);
-    }
-}
-
 
 # Implement in boot progress callback
-fun animate_progress_indicator (progress, time) {
-    if (global.progress_time == NULL) {
-        global.progress_time = progress;  #time;
-        switch_off_bullets ();
+fun animate_progress_indicator (time, progress) {
+    # Breathing effect
+    if (global.status == "normal") {
+        opacity = Math.Abs(2 - (time % 4)) / 2;
+        symbol.sprite.SetOpacity (opacity);
     }
-
-#    Debug ("progress = " + progress + ", time = " + time + " times switched = " + global.times_bullets_switched + " on_off " + global.on_off);
-
-#    if (global.times_bullets_switched == NULL)
-#        global.times_bullets_switched = 5;
-
-#    if (global.on_off == NULL)
-#        global.on_off = 0;
-
-    if ((progress - global.progress_time) >= 0.7) {
-        global.progress_time = progress;
-        
-        if (global.times_bullets_switched == 5) {
-            # Change which bullets are switched on
-            # and which ones are switched off
-            global.on_off = !global.on_off;
-            global.times_bullets_switched = 0;
-        }
-        
-        if (global.on_off) {
-            switch_on_bullet (progress_indicator.bullets_off, progress_indicator.bullets_on,
-                              global.times_bullets_switched, 1.0);
-        }
-        else {
-            switch_on_bullet (progress_indicator.bullets_on, progress_indicator.bullets_off,
-                              global.times_bullets_switched, 1.0);
-        }
+    else {
+        symbol.sprite.SetOpacity (1);
     }
-    
-    
-    # Start setting bullets to "on" with translucency
-#    for (index = 0; index <= 5; index++) {
-#        opacity = 0.0;
-#        while (opacity <= 1.0) {
-#            switch_on_bullet (progress_indicator.bullets_off, progress_indicator.bullets_on,
-#                              index, opacity);
-#            opacity += 0.1;
-#        }
-#    }
 }
 
 
@@ -1077,7 +956,7 @@ fun question_dialogue_setup (message_label, text_image) {
 
 # The callback function is called when the display should display a question dialogue.
 # First arg is prompt string, the second is the field contents.
-fun display_question_callback (prompt, contents) {  
+fun display_question_callback (prompt, contents) {
     global.status = "question";
     #Debug ("Reply: " + contents);
 
@@ -1092,7 +971,7 @@ fun display_question_callback (prompt, contents) {
         textImage = ImageToText(StringCopy (contents, i, StringLength (contents)));
     }
      
-    global.question_dialogue.content.SetImage (textImage);   
+    global.question_dialogue.content.SetImage (textImage);
 }
 
 
@@ -1108,7 +987,6 @@ Plymouth.SetDisplayQuestionFunction (display_question_callback);
 #
 fun refresh_callback ()
 {
-    draw_logo ();
 }
 Plymouth.SetRefreshFunction (refresh_callback);
 
@@ -1145,8 +1023,7 @@ Plymouth.SetDisplayNormalFunction (display_normal_callback);
 # Show the logo and make the progress indicator look full when on exit
 fun quit_callback ()
 {
-    logo.sprite.SetOpacity (1);
-    switch_on_bullets (); 
+    symbol.sprite.SetOpacity (1);
 }
 
 Plymouth.SetQuitFunction(quit_callback);
