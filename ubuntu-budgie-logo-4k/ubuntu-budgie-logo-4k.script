@@ -181,6 +181,7 @@ bits_per_pixel = Window.GetBitsPerPixel ();
 logo_filename = "ubuntu_budgie_logo.png";
 progress_dot_off_filename = "progress_dot_off.png";
 progress_dot_on_filename = "progress_dot_on.png";
+password_mask_filename = "password_mask.png";
 password_field_filename = "password_field.png";
 question_field_filename = "password_field.png";
 
@@ -516,7 +517,7 @@ fun password_dialogue_setup (message_label) {
     local.entry;
     local.bullet_image;
     
-    bullet_image = Image (progress_dot_off_filename);
+    bullet_image = Image (password_mask_filename);
     entry.image = Image (password_field_filename);
     
     # Hide the normal labels
@@ -1035,7 +1036,7 @@ fun question_dialogue_setup (message_label, text_image) {
     
     field.image = Image (question_field_filename);
     content = Sprite ();    
-    bullet_image = Image (progress_dot_off_filename);
+    bullet_image = Image (password_mask_filename);
     margin = bullet_image.GetWidth() / 2;
     
     # Hide the normal labels
