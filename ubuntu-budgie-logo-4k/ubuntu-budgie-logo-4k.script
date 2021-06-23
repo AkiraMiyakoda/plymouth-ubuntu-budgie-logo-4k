@@ -52,7 +52,7 @@ debugsprite_medium = Sprite();
 prompt_active = 0;
 
 # Ubuntu font
-ubuntufont = "Ubuntu 24";
+ubuntufont = "Ubuntu 27";
 ubuntualignment = "center";
 
 # General purpose function to create text
@@ -96,7 +96,7 @@ fun TextYOffset() {
     local.min_height;
 
     # Put the 1st line below the logo + some spacing 
-    y = logo.y + logo.height + (progress_indicator.bullet_height * 7 ); # + logo_spacing;
+    y = logo.y + logo.height + (progress_indicator.bullet_height * 3 ); # + logo_spacing;
 
     text_height = first_line_height * 7.5;
 
@@ -539,7 +539,7 @@ fun password_dialogue_setup (message_label) {
     entry.x = Window.GetX () + Window.GetWidth () / 2 - entry.image.GetWidth () / 2;
 
     # Put the entry below the second label.
-    entry.y = message_notification[2].y + label.height;
+    entry.y = message_notification[2].y + label.height * 1.5;
 
     #Debug ("entry x = " + entry.x + ", y = " + entry.y);
     entry.z = 10000;
@@ -1059,7 +1059,7 @@ fun question_dialogue_setup (message_label, text_image) {
     content_x = field.x + margin;
 
     # Put the field below the second label.
-    field.y = message_notification[2].y + label.height;
+    field.y = message_notification[2].y + label.height * 1.5;
     content_y = field.y + field.image.GetHeight () / 2 - text_image.GetHeight () / 2;
 
     #Debug ("field x = " + field.x + ", y = " + field.y);
