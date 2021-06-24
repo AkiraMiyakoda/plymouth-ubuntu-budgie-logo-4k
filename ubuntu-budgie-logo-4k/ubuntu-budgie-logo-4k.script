@@ -51,13 +51,21 @@ debugsprite_medium = Sprite();
 # are we currently prompting for a password?
 prompt_active = 0;
 
-# Ubuntu font
-ubuntufont = "Ubuntu 27";
-ubuntualignment = "center";
+# Font and image size
+if (Window.GetHeight() > 10800) {
+    image_resolution = "4k";
+    ubuntu_font = "Ubuntu 28";
+}
+else {
+    image_resolution = "2k";
+    ubuntu_font = "Ubuntu 14";
+}
+
+text_alignment = "center";
 
 # General purpose function to create text
 fun WriteText (text, colour) {
-    image = Image.Text (text, colour.red, colour.green, colour.blue, colour.alpha, ubuntufont, ubuntualignment);
+    image = Image.Text (text, colour.red, colour.green, colour.blue, colour.alpha, ubuntu_font, text_alignment);
     return image;
 }
 
@@ -175,14 +183,11 @@ fun StringToInteger (str) {
 Window.SetBackgroundTopColor (0.2353, 0.2314, 0.2157);     # Nice colour on top of the screen fading to
 Window.SetBackgroundBottomColor (0.2353, 0.2314, 0.2157);  # an equally nice colour on the bottom
 
-bits_per_pixel = Window.GetBitsPerPixel ();
-logo_filename = "ubuntu_budgie_logo.png";
-symbol_filename = "ubuntu_budgie_symbol.png";
-progress_dot_off_filename = "progress_dot_off.png";
-progress_dot_on_filename = "progress_dot_on.png";
-password_mask_filename = "password_mask.png";
-password_field_filename = "password_field.png";
-question_field_filename = "password_field.png";
+logo_filename           = "ubuntu_budgie_logo_"   + image_resolution + ".png";
+symbol_filename         = "ubuntu_budgie_symbol_" + image_resolution + ".png";
+password_mask_filename  = "password_mask_"        + image_resolution + ".png";
+password_field_filename = "password_field_"       + image_resolution + ".png";
+question_field_filename = "password_field_"       + image_resolution + ".png";
 
 logo.image = Image (logo_filename);
 logo.width = logo.image.GetWidth ();
