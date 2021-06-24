@@ -121,16 +121,16 @@ fun DebugMedium(text) {
 fun TextYOffset() {
     local.y;
     local.text_height;
-    local.min_height;
+    local.max_height;
 
     # Put the 1st line below the logo + some spacing 
-    y = logo.y + Math.Max(logo.height, symbol.height) + 60;
+    y = logo.y + Math.Max(logo.height, symbol.height) + first_line_height + 10;
 
     text_height = first_line_height * 7.5;
 
-    min_height = Window.GetHeight();
-    if (y + text_height > min_height)
-        y = min_height - text_height;
+    max_height = Window.GetHeight();
+    if (y + text_height > max_height)
+        y = max_height - text_height;
 
     return y;
 }
