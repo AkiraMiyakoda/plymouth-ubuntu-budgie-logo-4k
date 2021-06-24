@@ -52,7 +52,7 @@ debugsprite_medium = Sprite();
 prompt_active = 0;
 
 # Font and image size
-if (Window.GetHeight() > 10800) {
+if (Window.GetHeight() > 1080) {
     image_resolution = "4k";
     ubuntu_font = "Ubuntu 28";
 }
